@@ -1,0 +1,19 @@
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    name: Run Nix Flake Checks
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check Nix flake inputs
+        uses: DeterminateSystems/flake-checker-action@v4
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v3
+      - name: Run nix flake checks
+        # Run these serially (--max-jobs 1) to avoid them competing with each
+        # other for the Docker socket or the managed-docker-compose.service.
+        run: nix flake check --all-systems --max-jobs 1 -L
