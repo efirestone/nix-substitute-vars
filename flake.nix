@@ -6,8 +6,15 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils, ... }:
-    flake-utils.lib.eachDefaultSystem (system:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+      ...
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
         substituteVars = import ./lib/substituteVars.nix { inherit pkgs; };
@@ -22,5 +29,9 @@
             inherit pkgs substituteVars;
           };
         };
-      });
+
+        # For flake-check command
+        formatter = pkgs.nixfmt-rfc-style;
+      }
+    );
 }
