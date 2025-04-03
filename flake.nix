@@ -22,5 +22,8 @@
             inherit pkgs substituteVars;
           };
         };
+
+        # For flake-check command
+        formatter = pkgs.nixpkgs-fmt;
       });
 }
