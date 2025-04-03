@@ -1,17 +1,12 @@
 { pkgs, lib, substituteVars }:
 
 let
-  substitutions = {
-    name = "Marie";
-    city = "Zurich";
-  };
-
   scriptDrv = substituteVars {
     src = ./template.txt;
-    inherit substitutions;
-    mode = "0400";
-    owner = "root";
-    group = "wheel";
+    substitutions = {
+      name = "Marie";
+      city = "Zurich";
+    };
   };
 
   script = builtins.toString scriptDrv;
@@ -29,31 +24,6 @@ pkgs.runCommand "substituteVars-test" { } ''
     echo "Substitution test failed!"
     echo "Expected: '${expected}'"
     echo "Got:      '$actual'"
-    exit 1
-  fi
-
-  # This test doesn't currently work due to sandboxing
-  #perms=$(stat -c "%a" ${script})
-  #if [ "$perms" != "644" ]; then
-  #  echo "Permissions test failed!"
-  #  echo "Expected mode: 644"
-  #  echo "Got:           $perms"
-  #  exit 1
-  #fi
-
-  user=$(stat -c "%U" ${script})
-  if [ "$user" != "root" ]; then
-    echo "Owner test failed!"
-    echo "Expected owner: root"
-    echo "Got:            $user"
-    exit 1
-  fi
-
-  group=$(stat -c "%G" ${script})
-  if [ "$group" != "wheel" ]; then
-    echo "Group test failed!"
-    echo "Expected mode: wheel"
-    echo "Got:           $group"
     exit 1
   fi
 

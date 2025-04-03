@@ -1,5 +1,5 @@
 {
-  description = "Reusable substituteVars library flake with sandbox-safe permissions";
+  description = "Reusable substituteVars library flake";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs";
