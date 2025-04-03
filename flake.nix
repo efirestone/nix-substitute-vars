@@ -17,7 +17,7 @@
         packages.default = pkgs.writeText "substitute-lib-placeholder" "Use this as a lib flake";
         inherit lib;
 
-        checks.default = pkgs.callPackage ./tests/test.nix {
+        checks = import ./tests/test.nix {
           inherit pkgs lib;
           substituteVars = lib.substituteVars;
         };
