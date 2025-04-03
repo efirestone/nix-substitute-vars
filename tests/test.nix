@@ -1,4 +1,4 @@
-{ pkgs, lib, substituteVars }:
+{ pkgs, substituteVars }:
 
 let
   scriptDrv = substituteVars {
