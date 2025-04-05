@@ -9,18 +9,18 @@
   outputs = { self, nixpkgs, flake-utils, ... }:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        pkgs = import nixpkgs { inherit system; };
-        lib = {
-          substituteVars = import ./lib/substituteVars.nix { inherit pkgs; };
-        };
-      in {
-        packages.default = pkgs.writeText "substitute-lib-placeholder" "Use this as a lib flake";
-        inherit lib;
+        pkgs = nixpkgs.legacyPackages.${system};
+        substituteVars = import ./lib/substituteVars.nix { inherit pkgs; };
+      in
+      {
+        # Export our function
+        lib.substituteVars = substituteVars;
 
-        checks.default = pkgs.callPackage ./tests/test.nix {
-          inherit pkgs lib;
-          substituteVars = lib.substituteVars;
+        # Tests
+        checks = {
+          substitutionTest = import ./tests/test.nix {
+            inherit pkgs substituteVars;
+          };
         };
-      }
-    );
+      });
 }
