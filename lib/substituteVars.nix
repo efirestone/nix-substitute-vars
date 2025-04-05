@@ -3,7 +3,7 @@
 { src, substitutions }:
 
 let
-  name = "substituted-${builtins.baseNameOf (toString src)}";
+  name = "substituted-${builtins.baseNameOf (toString src)}-${builtins.hashString "sha1" (builtins.toJSON substitutions)}";
 
   # Properly escape ${var} as \${var} in sed command
   sedCommands = pkgs.lib.concatStringsSep "\n" (
