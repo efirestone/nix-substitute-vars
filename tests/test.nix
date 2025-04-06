@@ -1,31 +1,40 @@
-{ pkgs, substituteVars }:
+{ pkgs, module, substituteVars, ... }:
 
-let
-  scriptDrv = substituteVars {
-    src = ./template.txt;
-    substitutions = {
-      name = "Marie";
-      city = "Zurich";
+{
+  substitutionTest = pkgs.nixosTest {
+    name = "substituteVarsTest";
+
+    nodes.machine = { config, pkgs, ... }: {
+      imports = [ module ];
+
+      environment.systemPackages = with pkgs; [ coreutils gnused ];
+
+      users.groups.test = {};
+      users.users.test = {
+        isNormalUser = true;
+        extraGroups = [ "test" ];
+      };
+
+      # systemd.tmpfiles.rules = [
+      #   "d /tmp/substitution-vars/substitutionTest 0755 root root"
+      # ];
     };
+
+    testScript = ''
+      execute("id test")
+      print("Copying template")
+
+      machine.copy_from_host("${./template.txt}", "/tmp/template.txt")
+
+      print("Installing template.in")
+
+      machine.succeed('''
+        install -m 600 /tmp/template.txt /tmp/template.in
+      ''')
+
+      print("Running substituteVars")
+
+      machine.succeed("bash /tmp/substitute.sh")
+    '';
   };
-
-  script = builtins.toString scriptDrv;
-  expected = "Hello Marie\nWelcome to Zurich!\n";
-
-in
-pkgs.runCommand "substituteVars-test" { } ''
-  # Use this trick to avoid stripping newlines off the end of the output.
-  # This lets us verify that trailing newlines are not stripped during the substitution.
-  output=$(cat ${script}; ret=$?; echo .; exit "$ret")
-  ret=$?
-  actual=''${output%.}
-
-  if [ "$actual" != "${expected}" ]; then
-    echo "Substitution test failed!"
-    echo "Expected: '${expected}'"
-    echo "Got:      '$actual'"
-    exit 1
-  fi
-
-  echo "All tests passed." > $out
-''
+}
