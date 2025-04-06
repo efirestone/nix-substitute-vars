@@ -14,8 +14,7 @@ jobs:
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v3
       - name: Run nix flake checks
-        # Run these serially (--max-jobs 1) to avoid them competing with each
-        # other for the Docker socket or the managed-docker-compose.service.
+        # Run these serially (--max-jobs 1) to avoid them competing with each.
         run: nix flake check --all-systems --max-jobs 1 -L
   nix_format:
     name: Check Formatting
